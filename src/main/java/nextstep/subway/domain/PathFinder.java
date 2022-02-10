@@ -17,7 +17,7 @@ public class PathFinder {
     }
 
     public List<Station> getShortestPaths(Station source, Station target) {
-        if (isEmpty()) {
+        if (isEmptyLines()) {
             throw new LinesEmptyException();
         }
         if (isNotValidSourceOrTarget(source, target)) {
@@ -26,7 +26,7 @@ public class PathFinder {
         return calShortestPathes(source, target);
     }
 
-    private boolean isEmpty() {
+    private boolean isEmptyLines() {
         return lines == null || lines.isEmpty();
     }
 

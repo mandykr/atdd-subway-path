@@ -27,10 +27,7 @@ public class PathService {
         Station target = findStation(targetId);
 
         PathFinder pathFinder = new PathFinder(lineRepository.findAll());
-        List<Station> shortestPath = pathFinder.getShortestPaths(source, target);
-        int totalDistance = pathFinder.getPathDistance(source, target);
-
-        return new PathResponse(createStationResponses(shortestPath), totalDistance);
+        return getShortestPathResponse(pathFinder, source, target);
     }
 
     private Station findStation(Long stationId) {
@@ -40,5 +37,11 @@ public class PathService {
 
     private List<StationResponse> createStationResponses(List<Station> stations) {
         return stations.stream().map(StationResponse::of).collect(Collectors.toList());
+    }
+
+    public PathResponse getShortestPathResponse(PathFinder pathFinder, Station source, Station target) {
+        List<Station> shortestPath = pathFinder.getShortestPaths(source, target);
+        int totalDistance = pathFinder.getPathDistance(source, target);
+        return new PathResponse(createStationResponses(shortestPath), totalDistance);
     }
 }

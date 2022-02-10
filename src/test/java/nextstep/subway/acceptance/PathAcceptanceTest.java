@@ -73,7 +73,7 @@ class PathAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 최단_거리_경로_검색_요청(교대역, 교대역);
 
         // then
-        PathSteps.최단_거리_경로_검색_실패(response);
+        최단_거리_경로_검색_실패(response);
     }
 
     /**

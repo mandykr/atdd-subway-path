@@ -2,6 +2,7 @@ package nextstep.subway.unit;
 
 import nextstep.subway.applicaion.PathService;
 import nextstep.subway.applicaion.dto.PathResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,13 +10,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 
 class PathServiceTest {
     StationRepository stationRepository = mock(StationRepository.class);
@@ -23,13 +22,12 @@ class PathServiceTest {
 
     PathService pathService = new PathService(stationRepository, lineRepository);
 
-    Long source = 1L;
-    Long target = 2L;
-
+    PathFinder pathFinder;
     Station 강남역;
     Station 양재역;
     Station 남부터미널역;
     List<Line> lines = new ArrayList<>();
+    int totalDistance = 20;
 
     @BeforeEach
     void setUp() {
@@ -52,6 +50,8 @@ class PathServiceTest {
         lines.add(이호선);
         lines.add(삼호선);
         lines.add(신분당선);
+
+        pathFinder = new PathFinder(lines);
     }
 
 
@@ -59,15 +59,14 @@ class PathServiceTest {
     @DisplayName("출발역과 도착역으로 경로의 최단 거리 검색")
     void searchShortestPaths() {
         // given
-        given(stationRepository.findById(source)).willReturn(Optional.of(강남역));
-        given(stationRepository.findById(target)).willReturn(Optional.of(남부터미널역));
         given(lineRepository.findAll()).willReturn(lines);
 
         // when
-        PathResponse response = pathService.searchShortestPaths(source, target);
+        PathResponse response = pathService.getShortestPathResponse(pathFinder, 강남역, 남부터미널역);
 
         // then
-        then(stationRepository).should(times(2)).findById(anyLong());
-        then(lineRepository).should(times(1)).findAll();
+        List<String> names = response.getStations().stream().map(StationResponse::getName).collect(Collectors.toList());
+        assertThat(names).contains(강남역.getName(), 남부터미널역.getName());
+        assertThat(response.getDistance()).isEqualTo(totalDistance);
     }
 }
