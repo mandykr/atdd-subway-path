@@ -1,9 +1,11 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.error.exception.InvalidValueException;
+
 import javax.persistence.*;
 
 @Entity
-public class Section {
+public class Section implements Comparable<Section> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,6 +35,32 @@ public class Section {
         this.distance = distance;
     }
 
+    public boolean doesContains(Station station) {
+        return station.equals(upStation) ||
+                station.equals(downStation);
+    }
+
+    public boolean isNextSection(Station downStation) {
+        return upStation.equals(downStation);
+    }
+
+    public void changeUpStationWhenAdd(Section section) {
+        upStation = section.getDownStation();
+        changeDistance(distance - section.distance);
+    }
+
+    public void changeUpStationWhenRemove(Section section) {
+        upStation = section.getUpStation();
+        changeDistance(distance + section.distance);
+    }
+
+    private void changeDistance(int distance) {
+        if (distance < 1) {
+            throw new InvalidValueException();
+        }
+        this.distance = distance;
+    }
+
     public Long getId() {
         return id;
     }
@@ -51,5 +79,13 @@ public class Section {
 
     public int getDistance() {
         return distance;
+    }
+
+    @Override
+    public int compareTo(Section section) {
+        if (downStation.equals(section.getUpStation())) {
+            return 1;
+        }
+        return 0;
     }
 }
